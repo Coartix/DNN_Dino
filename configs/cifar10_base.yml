@@ -1,0 +1,22 @@
+
+# Dataset
+dataset_path: /data/cifar10
+
+img_size: 32
+num_classes: 10
+
+global_crop_ratio: !!python/tuple [0.4, 1.0]
+local_crop_ratio: !!python/tuple [0.05, 0.4]
+
+nb_local_crops: 8
+
+dataset_means: [0.4914, 0.4822, 0.4465]
+dataset_stds: [0.2023, 0.1994, 0.2010]
+
+# Training
+batch_size: 128
+epochs: 200
+
+# Optimizer
+optimizer: adamw
+weight_decay: 0.
