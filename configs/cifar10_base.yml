@@ -1,6 +1,8 @@
 
 # Dataset
-dataset_path: /data/cifar10
+original_dataset_path: data/cifar10/original
+train_dataset_path: data/cifar10/train
+test_dataset_path: data/cifar10/test
 
 img_size: 32
 num_classes: 10

@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 import yaml
 
-from utils import get_train_test_dataloaders
+from utils import get_train_test_dataloaders, Config
 from models import DINO
 from Trainer import Trainer
 
@@ -43,7 +43,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     with open(args.config) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        yml_dict = yaml.load(f, Loader=yaml.FullLoader)
+    
+    config = Config(yml_dict)
     
     train(config)
     

@@ -1,5 +1,5 @@
 import torch.nn as nn
-import toch.nn.functional as F
+import torch.nn.functional as F
 import torchvision.transforms as transforms
 from PIL import Image
 
@@ -61,11 +61,11 @@ class DataAugmentation:
             normalize
         ])
         
-        def __call__(self, image):
-            global_crop_1 = self.apply_global_crop_1(image)
-            global_crop_2 = self.apply_global_crop_2(image)
-            local_crops = [self.apply_local_crop(image) for _ in range(self.nb_local_crops)]
-            
-            return [global_crop_1, global_crop_2] + local_crops
+    def __call__(self, image):
+        global_crop_1 = self.apply_global_crop_1(image)
+        global_crop_2 = self.apply_global_crop_2(image)
+        local_crops = [self.apply_local_crop(image) for _ in range(self.nb_local_crops)]
+        
+        return [global_crop_1, global_crop_2] + local_crops
             
         
