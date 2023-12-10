@@ -3,13 +3,7 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 
-class ViT_small(nn.Module):
-    def __init__(self):
-        super(ViT_small, self).__init__()
-        
-        # TODO : Implement ViT_small
-        pass
-    
+
 class DINOHead(nn.Module):
     def __init__(self):
         super(DINOHead, self).__init__()
