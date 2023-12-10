@@ -23,7 +23,9 @@ class Trainer:
         pass
     
     def train(self):
-        
+        for epoch in range(self.config.epochs):
+            self.train_one_epoch(epoch)
+            
     
     def eval(self):
         pass
