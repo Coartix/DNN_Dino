@@ -10,7 +10,8 @@ class Trainer:
         optimizer: torch.optim.Optimizer,
         scheduler: torch.optim.lr_scheduler,
         train_dataloader: torch.utils.data.DataLoader,
-        test_dataloader: torch.utils.data.DataLoader
+        test_dataloader: torch.utils.data.DataLoader,
+        config: dict
     ):
         self.model = model
         self.optimizer = optimizer
@@ -18,8 +19,11 @@ class Trainer:
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
         
-    def train(self):
+    def train_one_epoch(self, epoch):
         pass
+    
+    def train(self):
+        
     
     def eval(self):
         pass

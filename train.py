@@ -24,12 +24,16 @@ def train(config: dict):
     lr = 0.0005 * args.batch_size / 256
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
     
+    # TODO : Implement scheduler
+    scheduler = None
+    
     trainer = Trainer(
         model=model,
         optimizer=optimizer,
-        scheduler=None,
+        scheduler=scheduler,
         train_dataloader=train_dataloader,
-        test_dataloader=test_dataloader
+        test_dataloader=test_dataloader,
+        config=config
     )
     
     trainer.train()
