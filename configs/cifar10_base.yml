@@ -15,6 +15,9 @@ nb_local_crops: 8
 dataset_means: [0.4914, 0.4822, 0.4465]
 dataset_stds: [0.2023, 0.1994, 0.2010]
 
+# Model
+model: resnet18
+
 # Training
 batch_size: 128
 epochs: 200
