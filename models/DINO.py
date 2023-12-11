@@ -127,23 +127,20 @@ class DINO_Loss(nn.Module):
         batch_center = torch.cat(teacher_out).mean(dim=0, keepdim=True)
         self.center = self.center * self.center_momentum + batch_center * (1 - self.center_momentum)
         
-    def forward(self, student_out, teacher_out):
-        student_temp = [s / self.student_temp for s in student_out]
-        teacher_out = [(t - self.center) / self.teacher_temp for t in teacher_out]
-        
-        student_sm = [F.softmax(s, dim=-1) for s in student_temp]
-        teacher_sm = [F.softmax(t, dim=-1).detach() for t in teacher_out]
-        
+    def forward(self, _student_out, _teacher_out):
+        student_out = [s / self.student_temp for s in _student_out]
+        teacher_out = [F.softmax((t - self.center) / self.teacher_temp, dim=-1).detach() for t in _teacher_out]
+                
         loss = 0
         count = 0
         
-        for t_ix, t in enumerate(teacher_sm):
-            for s_ix, s in enumerate(student_sm):
+        for t_ix, t in enumerate(teacher_out):
+            for s_ix, s in enumerate(student_out):
                 if t_ix == s_ix:
                     continue
                 
-                tmp_loss = torch.sum(-t * s, dim=-1)
-                loss += torch.mean(tmp_loss)
+                tmp_loss = torch.sum(-t * F.log_softmax(s, dim=-1), dim=-1)
+                loss += tmp_loss.mean()
                 count += 1
         
         loss /= count
