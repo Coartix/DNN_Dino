@@ -5,7 +5,7 @@ import argparse
 import yaml
 
 from utils import get_train_test_dataloaders, Config
-from models import DINO
+from models.DINO import DINO, DINO_Loss
 from Trainer import Trainer
 
 def train(config: dict):
@@ -18,19 +18,23 @@ def train(config: dict):
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = DINO()
+    model = DINO(enc_type=config.encoder_type, out_dim=config.out_dim)
     model = model.to(device)
     
-    lr = 0.0005 * args.batch_size / 256
+    lr = 0.0005 * config.batch_size / 256
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
     
     # TODO : Implement scheduler
     scheduler = None
     
+    loss_fn = DINO_Loss(config.out_dim).to(device)
+    
     trainer = Trainer(
         model=model,
+        loss_fn=loss_fn,
         optimizer=optimizer,
         scheduler=scheduler,
+        device=device,
         train_dataloader=train_dataloader,
         test_dataloader=test_dataloader,
         config=config

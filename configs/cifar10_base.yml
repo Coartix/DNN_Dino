@@ -16,7 +16,10 @@ dataset_means: [0.4914, 0.4822, 0.4465]
 dataset_stds: [0.2023, 0.1994, 0.2010]
 
 # Model
-model: resnet18
+encoder_type: resnet18
+out_dim: 128
+
+teacher_momentum: 0.996
 
 # Training
 batch_size: 128

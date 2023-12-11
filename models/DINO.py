@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class DINOHead(nn.Module):
+class DINO_Head(nn.Module):
     def __init__(self, in_dim, out_dim, hidden_dim, bottleneck_dim):
-        super(DINOHead, self).__init__()
+        super(DINO_Head, self).__init__()
         
         self.mlp = nn.Sequential(
             nn.Linear(in_dim, hidden_dim),
@@ -46,7 +46,7 @@ class DINO_ViT(nn.Module):
     
 
 class DINO(nn.Module):
-    def __init__(self, enc_type, in_dim, out_dim, hidden_dim=2048, bottleneck_dim=256):
+    def __init__(self, enc_type, enc_out_dim=1000, out_dim=128, hidden_dim=2048, bottleneck_dim=256):
         super(DINO, self).__init__()
         
         if enc_type == "resnet18":
@@ -58,14 +58,14 @@ class DINO(nn.Module):
             pass
         
         self.student_backbone = enc()
-        self.student_head = DINOHead(in_dim, out_dim, hidden_dim, bottleneck_dim)
+        self.student_head = DINO_Head(enc_out_dim, out_dim, hidden_dim, bottleneck_dim)
         
         self.teacher_backbone = enc()
-        self.teacher_head = DINOHead(in_dim, out_dim, hidden_dim, bottleneck_dim)
+        self.teacher_head = DINO_Head(enc_out_dim, out_dim, hidden_dim, bottleneck_dim)
         
         self._init_freeze_teacher()
 
-    def _freeze_teacher(self):
+    def _init_freeze_teacher(self):
         # init teacher weights with student weights
         self.teacher_backbone.load_state_dict(self.student_backbone.state_dict())
         
@@ -75,6 +75,15 @@ class DINO(nn.Module):
             
         for param in self.teacher_head.parameters():
             param.requires_grad = False
+            
+    def update_teacher(self, teacher_momentum):
+        for (student_ps_backbone, teacher_ps_backbone), (student_ps_head, teacher_ps_head) in zip(
+            zip(self.student_backbone.parameters(), self.teacher_backbone.parameters()),
+            zip(self.student_head.parameters(), self.teacher_head.parameters())
+        ):
+            teacher_ps_backbone.data = teacher_ps_backbone.data * (1-teacher_momentum) + student_ps_backbone.data * teacher_momentum
+            teacher_ps_head.data = teacher_ps_head.data * (1-teacher_momentum) + student_ps_head.data * teacher_momentum
+
             
     def _student_forward(self, x):
         x = self.student_backbone(x)

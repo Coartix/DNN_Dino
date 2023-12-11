@@ -12,10 +12,8 @@ class Config:
 def get_train_test_dataloaders(config: dict):
     data_aug = DataAugmentation(
         config.img_size,
-        config.global_crop_min_size,
-        config.global_crop_max_size,
-        config.local_crop_min_size,
-        config.local_crop_max_size,
+        config.global_crop_ratio,
+        config.local_crop_ratio,
         config.nb_local_crops,
         config.dataset_means,
         config.dataset_stds
