@@ -1,5 +1,6 @@
 import torch
 import torchvision
+import torchvision.transforms as transforms
 import math
 
 from DataAugmentation import DataAugmentation
@@ -19,22 +20,35 @@ def get_train_test_dataloaders(config: dict):
         config.dataset_means,
         config.dataset_stds
     )
+    transform_plain = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            transforms.Resize((224, 224)),
+        ]
+    )
 
-    dataset_train = torchvision.datasets.CIFAR10(
-        root=config.train_dataset_path,
+    dataset_train_plain = torchvision.datasets.CIFAR10(
+        root=config.train_dataset_plain_path,
+        train=True,
+        transform=transform_plain,
+        download=True
+    )
+    train_dataloader_plain = torch.utils.data.DataLoader(
+        dataset_train_plain,
+        batch_size=config.batch_size_eval,
+        num_workers=4,
+        drop_last=False
+    )
+
+    dataset_train_aug = torchvision.datasets.CIFAR10(
+        root=config.train_dataset_aug_path,
         train=True,
         transform=data_aug,
         download=True
     )
-    dataset_test = torchvision.datasets.CIFAR10(
-        root=config.test_dataset_path,
-        train=False,
-        transform=data_aug,
-        download=True
-    )
-    
-    train_dataloader = torch.utils.data.DataLoader(
-        dataset_train,
+    train_dataloader_aug = torch.utils.data.DataLoader(
+        dataset_train_aug,
         batch_size=config.batch_size,
         shuffle=True,
         num_workers=4,
@@ -42,16 +56,20 @@ def get_train_test_dataloaders(config: dict):
         drop_last=True
     )
     
+    dataset_test = torchvision.datasets.CIFAR10(
+        root=config.test_dataset_path,
+        train=False,
+        transform=transform_plain,
+        download=True
+    )
     test_dataloader = torch.utils.data.DataLoader(
         dataset_test,
         batch_size=config.batch_size,
-        shuffle=False,
         num_workers=4,
-        pin_memory=True,
-        drop_last=True
+        drop_last=False
     )
     
-    return train_dataloader, test_dataloader
+    return train_dataloader_plain, train_dataloader_aug, test_dataloader
 
 
 
@@ -94,3 +112,12 @@ def _no_grad_trunc_normal_(tensor, mean, std, a, b):
 def trunc_normal_(tensor, mean=0., std=1., a=-2., b=2.):
     # type: (Tensor, float, float, float, float) -> Tensor
     return _no_grad_trunc_normal_(tensor, mean, std, a, b)
+
+
+def clip_gradients(model, clip_value=2.0):
+    for p in model.parameters():
+        if p.grad is not None:
+            param_norm = p.grad.data.norm(2)
+            clip_coef = clip_value / (param_norm + 1e-6)
+            if clip_coef < 1:
+                p.grad.data.mul_(clip_coef)

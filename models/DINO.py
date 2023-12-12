@@ -36,14 +36,7 @@ class DINO_Head(nn.Module):
         x = F.normalize(x, p=2, dim=-1)
         
         return self.last_layer(x)
-    
-class DINO_ViT(nn.Module):
-    def __init__(self):
-        super(DINO_ViT, self).__init__()
-        
-        # TODO : Implement DINO with teacher and student networks as ViT_small and DINOHead on top
-        pass
-    
+
 
 class DINO(nn.Module):
     def __init__(self, enc_type, enc_out_dim=1000, out_dim=128, hidden_dim=2048, bottleneck_dim=256):
@@ -53,6 +46,8 @@ class DINO(nn.Module):
             enc = torchvision.models.resnet18
         elif enc_type == "resnet34":
             enc = torchvision.models.resnet34
+        elif enc_type == "resnet50":
+            enc = torchvision.models.resnet50
         elif enc_type == "vit":
             # TODO : Implement ViT
             pass

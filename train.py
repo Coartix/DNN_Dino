@@ -14,18 +14,23 @@ def train(config: dict):
     torch.cuda.manual_seed(42)
     np.random.seed(42)
     
-    train_dataloader, test_dataloader = get_train_test_dataloaders(config)
+    train_dataloader_plain, train_dataloader_aug, test_dataloader = get_train_test_dataloaders(config)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = DINO(enc_type=config.encoder_type, out_dim=config.out_dim)
+    model = DINO(
+        enc_type=config.encoder_type,
+        out_dim=config.out_dim,
+        hidden_dim=config.hidden_dim,
+        bottleneck_dim=config.bottleneck_dim,
+    )
     model = model.to(device)
     
     lr = 0.0005 * config.batch_size / 256
+    # lr = 0.001
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
     
-    # TODO : Implement scheduler
-    scheduler = None
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, config.epochs, eta_min=0)
     
     loss_fn = DINO_Loss(config.out_dim).to(device)
     
@@ -35,7 +40,8 @@ def train(config: dict):
         optimizer=optimizer,
         scheduler=scheduler,
         device=device,
-        train_dataloader=train_dataloader,
+        train_dataloader_aug=train_dataloader_aug,
+        train_dataloader_plain=train_dataloader_plain,
         test_dataloader=test_dataloader,
         config=config
     )
