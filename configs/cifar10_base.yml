@@ -25,7 +25,7 @@ teacher_momentum: 0.996
 
 # Training
 batch_size: 256
-epochs: 150
+epochs: 60
 
 # Eval
 batch_size_eval: 128
