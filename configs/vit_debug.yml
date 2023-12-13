@@ -17,8 +17,8 @@ dataset_stds: [0.2023, 0.1994, 0.2010]
 # Model
 encoder_type: vit
 out_dim: 200
-hidden_dim: 2048
-bottleneck_dim: 256
+hidden_dim: 128
+bottleneck_dim: 64
 
 teacher_momentum: 0.996
 
@@ -27,8 +27,16 @@ batch_size: 32
 epochs: 2
 
 # Eval
-batch_size_eval: 128
+batch_size_eval: 32
 
 # Optimizer
 optimizer: adamw
 weight_decay: 0.
+
+# Encoder
+enc_out_dim: 128
+
+#ViT
+depth: 2
+num_heads: 2
+mlp_ratio: 2.

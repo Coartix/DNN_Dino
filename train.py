@@ -19,10 +19,7 @@ def train(config: dict):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = DINO(
-        enc_type=config.encoder_type,
-        out_dim=config.out_dim,
-        hidden_dim=config.hidden_dim,
-        bottleneck_dim=config.bottleneck_dim,
+        config=config
     )
     model = model.to(device)
     

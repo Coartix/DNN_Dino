@@ -173,7 +173,6 @@ class ViT_small(nn.Module):
         if npatch == N and w == h:
             return self.pos_embed
         
-        '''
         # If the number of patches is different from the number of positional embeddings
         class_pos_embed = self.pos_embed[:, 0]
         patch_pos_embed = self.pos_embed[:, 1:]
@@ -194,7 +193,6 @@ class ViT_small(nn.Module):
         # Reshape the positional encoding back to the original shape
         patch_pos_embed = patch_pos_embed.permute(0, 2, 3, 1).view(1, -1, dim)
         return torch.cat((class_pos_embed.unsqueeze(0), patch_pos_embed), dim=1)
-        '''
 
     def prepare_tokens(self, x):
         B, nc, w, h = x.shape

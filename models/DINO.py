@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from models.ViT import vit_tiny
 
-
 class DINO_Head(nn.Module):
     def __init__(self, in_dim, out_dim, hidden_dim, bottleneck_dim):
         super(DINO_Head, self).__init__()
@@ -40,25 +39,38 @@ class DINO_Head(nn.Module):
     
 
 class DINO(nn.Module):
-    def __init__(self, enc_type, enc_out_dim=1000, out_dim=128, hidden_dim=2048, bottleneck_dim=256):
+    def __init__(self, config: dict):
         super(DINO, self).__init__()
+
+        self.config = config
+        self.enc_out_dim = config.enc_out_dim
+        self.enc_type = config.encoder_type
+        self.out_dim = config.out_dim
+        self.hidden_dim = config.hidden_dim
+        self.bottleneck_dim = config.bottleneck_dim
         
-        if enc_type == "resnet18":
-            enc = torchvision.models.resnet18
-        elif enc_type == "resnet34":
-            enc = torchvision.models.resnet34
-        elif enc_type == "resnet50":
-            enc = torchvision.models.resnet50
-        elif enc_type == "vit":
-            enc = vit_tiny
+        self.student_backbone = self._create_encoder()
+        self.student_head = DINO_Head(self.enc_out_dim, self.out_dim, self.hidden_dim, self.bottleneck_dim)
         
-        self.student_backbone = enc()
-        self.student_head = DINO_Head(enc_out_dim, out_dim, hidden_dim, bottleneck_dim)
-        
-        self.teacher_backbone = enc()
-        self.teacher_head = DINO_Head(enc_out_dim, out_dim, hidden_dim, bottleneck_dim)
+        self.teacher_backbone = self._create_encoder()
+        self.teacher_head = DINO_Head(self.enc_out_dim, self.out_dim, self.hidden_dim, self.bottleneck_dim)
         
         self._init_freeze_teacher()
+        
+    def _create_encoder(self):
+        if self.enc_type == "resnet18":
+            return torchvision.models.resnet18()
+        elif self.enc_type == "resnet34":
+            return torchvision.models.resnet34()
+        elif self.enc_type == "resnet50":
+            return torchvision.models.resnet50()
+        elif self.enc_type == "vit":
+            return vit_tiny(embed_dim=self.config.enc_out_dim,
+                            depth=self.config.depth,
+                            num_heads=self.config.num_heads,
+                            mlp_ratio=self.config.mlp_ratio)
+        else:
+            raise ValueError(f"Unsupported encoder type: {self.enc_type}")
 
     def _init_freeze_teacher(self):
         # init teacher weights with student weights
