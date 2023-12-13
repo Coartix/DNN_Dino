@@ -217,6 +217,6 @@ class ViT_small(nn.Module):
         return self.head(x[:, 0])
         
         
-def vit_tiny(patch_size=16, **kwargs):
+def vit_tiny(patch_size=8, **kwargs):
     model = ViT_small(patch_size=patch_size, **kwargs)
     return model

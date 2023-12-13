@@ -2,6 +2,7 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
+from models.ViT import vit_tiny
 
 
 class DINO_Head(nn.Module):
@@ -36,7 +37,7 @@ class DINO_Head(nn.Module):
         x = F.normalize(x, p=2, dim=-1)
         
         return self.last_layer(x)
-
+    
 
 class DINO(nn.Module):
     def __init__(self, enc_type, enc_out_dim=1000, out_dim=128, hidden_dim=2048, bottleneck_dim=256):
@@ -49,8 +50,7 @@ class DINO(nn.Module):
         elif enc_type == "resnet50":
             enc = torchvision.models.resnet50
         elif enc_type == "vit":
-            # TODO : Implement ViT
-            pass
+            enc = vit_tiny
         
         self.student_backbone = enc()
         self.student_head = DINO_Head(enc_out_dim, out_dim, hidden_dim, bottleneck_dim)
