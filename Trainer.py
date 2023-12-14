@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from eval import Eval
+from eval import eval_knn
 import utils
 
 class Trainer:
@@ -26,9 +26,7 @@ class Trainer:
         self.test_dataloader = test_dataloader
         self.config = config
         self.device = device
-        
-        self.evaluator = Eval(self.model, self.train_dataloader_plain, self.test_dataloader, self.device)
-        
+                
         self.print_config()
         
     def print_config(self):
@@ -85,7 +83,7 @@ class Trainer:
             
     
     def eval(self):
-        knn_acc = self.evaluator.eval_knn()
+        knn_acc = eval_knn(self.model, self.train_dataloader_plain, self.test_dataloader, self.device)
         
         print(f"\nKNN Accuracy: {knn_acc:.4f}")
     

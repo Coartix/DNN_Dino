@@ -105,7 +105,7 @@ class DINO(nn.Module):
         return x
         
     def forward(self, x, training=False):
-        if not training: return self._student_forward(x)
+        if not training: return self.student_backbone(x)
      
         all_crops = torch.cat(x, dim=0)
         global_crops = torch.cat(x[:2], dim=0)

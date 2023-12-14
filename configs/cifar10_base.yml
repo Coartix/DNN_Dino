@@ -15,17 +15,25 @@ nb_local_crops: 8
 dataset_means: [0.4914, 0.4822, 0.4465]
 dataset_stds: [0.2023, 0.1994, 0.2010]
 
+# Training
+batch_size: 512
+epochs: 60
+
 # Model
-encoder_type: resnet50
+encoder_type: vit
 out_dim: 200
-hidden_dim: 2048
-bottleneck_dim: 256
+hidden_dim: 512
+bottleneck_dim: 64
 
 teacher_momentum: 0.996
 
-# Training
-batch_size: 256
-epochs: 60
+# Encoder
+enc_out_dim: 192
+
+#ViT
+depth: 12
+num_heads: 3
+mlp_ratio: 4.
 
 # Eval
 batch_size_eval: 128
